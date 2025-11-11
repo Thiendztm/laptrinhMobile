@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "364809078535",
+    "project_id": "loginauth-b240e",
+    "storage_bucket": "loginauth-b240e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:364809078535:android:f9331985383710e281e7a2",
+        "android_client_info": {
+          "package_name": "uth.edu.bai1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6GmJYSuOvb3jAw8wQIhgL_UGY_eD0IpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
