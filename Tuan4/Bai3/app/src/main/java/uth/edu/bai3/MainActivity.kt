@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -59,25 +58,165 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import android.util.Log
+import androidx.compose.material3.Scaffold
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.util.Calendar
+import io.ktor.client.HttpClient
+import androidx.compose.runtime.LaunchedEffect
+import coil3.compose.AsyncImage
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
+import uth.edu.bai3.model.Task
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Card
+import androidx.compose.foundation.lazy.items
+import uth.edu.bai3.model.TaskResponse
 
 class MainActivity : ComponentActivity() {
+    private val client = HttpClient(CIO){
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AppNavigation()
+            var tasks by remember{
+                mutableStateOf<List<Task>>(emptyList())
+            }
+            var isLoading by remember{
+                mutableStateOf(true)
+            }
+            var errorMessage by remember{
+                mutableStateOf<String?>(null)
+            }
+            var serverResponse by remember {
+                mutableStateOf("Loading...")
+            }
+
+            LaunchedEffect(true) {
+                withContext(Dispatchers.IO) {
+                    try {
+                        tasks = getTasks()
+                        isLoading = false
+                        serverResponse = "Succes"
+                    } catch (exception: Exception) {
+                        errorMessage = "Error: $exception"
+                        isLoading = false
+                        serverResponse = "False"
+                    }
+                }
+            }
+
+            // AppNavigation()
+            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                when {
+                    isLoading -> {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            Text("Loading...", modifier = Modifier.padding(innerPadding))
+                        }
+                    }
+                    errorMessage != null -> {
+                        Text(
+                            text = errorMessage!!,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                    else -> {
+                        TaskList(
+                            tasks = tasks,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                }
+            }
         }
     }
+
+
+    @Composable
+    fun TaskList(tasks: List<Task>, modifier: Modifier = Modifier) {
+        LazyColumn(modifier = modifier) {
+            items(tasks) { task ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = task.title,
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        Text(
+                            text = task.description,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "Status: ${task.status}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = "Priority: ${task.priority}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            text = "Subtasks: ${task.subtasks.size}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun getTasks(): List<Task> {
+        val response = client.get("https://amock.io/api/researchUTH/tasks")
+            .body<TaskResponse>()
+
+        return if (response.isSuccess) {
+            response.data
+        } else {
+            emptyList()
+        }
+    }
+
+}
+
+@Composable
+fun ServerResponse(contents: String) {
+    Column(
+        modifier = Modifier
+            .padding(top = 70.dp, bottom = 36.dp)
+    ){
+        Text(
+            text = contents,
+            modifier = Modifier
+        )
+    }
+
 }
 
 @Composable
@@ -355,3 +494,5 @@ private suspend fun signInWithGoogle(context: Context, navController: NavHostCon
         Log.e("Auth", "GetCredentialException: $e")
     }
 }
+
+

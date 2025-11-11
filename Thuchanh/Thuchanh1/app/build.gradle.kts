@@ -2,16 +2,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.gms.google-services")
-    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
-    namespace = "uth.edu.bai3"
+    namespace = "uth.edu.thuchanh1"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "uth.edu.bai3"
+        applicationId = "uth.edu.thuchanh1"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -58,27 +56,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth")
-
-    // Google Sign-In
-    implementation("com.google.android.gms:play-services-auth:21.4.0")
-    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
-    val nav_version = "2.9.5"
-    implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
-    implementation("io.coil-kt:coil-compose:2.7.0")
-    implementation("com.squareup.okhttp3:okhttp:5.2.1")
-
-    implementation("io.ktor:ktor-client-core:3.3.1")
-    implementation("io.ktor:ktor-client-cio:3.3.1")
-    implementation("io.ktor:ktor-client-content-negotiation:3.3.1")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
-    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
-
-}
+    implementation("androidx.navigation:navigation-compose:2.9.5")}
